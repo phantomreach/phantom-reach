@@ -1,13 +1,25 @@
 /**
  * PoseDetection Module
- * Handles real-time pose detection and landmark extraction from webcam feed using MediaPipe's PoseLandmarker.
+ * 
+ * What it does:
+ * Handles real-time pose detection and landmark extraction from webcam feed
+ * using MediaPipe's PoseLandmarker.
+ * 
+ * How:
+ * - Processes video frames using MediaPipe
+ * - Extracts specific body landmarks (elbows)
+ * - Normalizes coordinates for downstream processing
+ * 
+ * Why:
+ * To track user's arm movements in real-time for phantom limb therapy
  */
-import { FilesetResolver, PoseLandmarker } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest';
 
 export async function initializePoseLandmarker() {
-    const vision = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm');
+    const vision = await FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm'
+    );
     return await PoseLandmarker.createFromOptions(vision, {
-        baseOptions: { modelAssetPath: './assets/models/pose_landmarker.task' },
+        baseOptions: { modelAssetPath: '../assets/models/pose_landmarker.task' },
         runningMode: 'VIDEO',
         numPoses: 1,
         minPoseDetectionConfidence: 0.5,
@@ -18,11 +30,12 @@ export async function initializePoseLandmarker() {
 
 export async function detectElbows(poseLandmarker, video) {
     const results = await poseLandmarker.detectForVideo(video, performance.now());
-    if (!results || !results.landmarks || !results.landmarks.length) return null;
-
-    const landmarks = results.landmarks[0];
-    return {
-        leftElbow: { x: landmarks[13].x, y: landmarks[13].y },
-        rightElbow: { x: landmarks[14].x, y: landmarks[14].y },
-    };
+    if (results && results.landmarks.length > 0) {
+        const landmarks = results.landmarks[0];
+        return {
+            leftElbow: landmarks[13],
+            rightElbow: landmarks[14],
+        };
+    }
+    return null;
 }
