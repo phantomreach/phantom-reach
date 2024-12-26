@@ -3,20 +3,24 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Deploy to GitHub Pages
+      # Move content from project-root to root level
+      - name: Move files to root
+        run: |
+          mv project-root/* ./
+          mv project-root/.* ./ || true
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}  # Use default GitHub token
-          publish_dir: project-root/  # Point to the directory with index.html
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
