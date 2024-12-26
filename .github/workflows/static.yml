@@ -1,8 +1,9 @@
 name: Deploy to GitHub Pages
-uses: peaceiris/actions-gh-pages@v3
-  with:
-    personal_token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-    publish_dir: ./project-root
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch
 
 jobs:
   build-and-deploy:
@@ -17,5 +18,5 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: project-root/  # This is the folder containing index.html
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Use default GitHub token
+          publish_dir: project-root/  # Point to the directory with index.html
